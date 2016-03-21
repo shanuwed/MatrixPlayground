@@ -11,9 +11,80 @@ object MyClass {
 
     //test1()
 
-    test2()
+    //test2()
 
     //test3()
+
+    //test4()
+
+    test5()
+  }
+
+  def test5(): Unit ={
+    //12500 causes OutOfMemoryError
+    val numRows = 1250
+    val numCols = 1250
+
+    val m1 = identityMatrix(numRows)
+
+    val rng = new MyRand()
+
+    val m2 = DenseMatrix.rand(numRows, numCols, rng)
+
+    val result = m1.multiply(m2)
+
+    print(result.toString())
+  }
+
+  // Allocate an identity matrix - a square matrix with main diagonal values of one
+  // Example: 2x2 identity matrix
+  // 1 0
+  // 0 1
+  def identityMatrix(numSize : Int) : DenseMatrix = {
+    require(numSize.toLong * numSize <= Int.MaxValue,
+      s"$numSize * $numSize is too large to allocate")
+
+    // Initialized to all zero
+    val vec = new Array[Double](numSize * numSize)
+    var index = 0
+    var seg = 0
+    var offset = 0
+    val max = numSize.toLong * numSize
+    while(index < max){
+      if(index % numSize == 0) {
+        vec(index + offset) = 1
+        offset += 1
+      }
+      index += 1
+    }
+    new DenseMatrix(numSize, numSize, vec)
+  }
+
+  def test4() : Unit = {
+
+    val numRows = 2
+    val numCols = 2
+    val values = Array[Double](1.0, 0.0, 0.0, 1.0)
+
+    val m1_test = new DenseMatrix(numRows, numCols, values)
+
+    val m1 = identityMatrix(2) // 2 x 2
+
+    //val rng = new Random()
+    val rng = new MyRand()
+
+    val m2 = DenseMatrix.rand(numRows, numCols, rng)
+
+    val result = m1.multiply(m2)
+
+    print(result.toString())
+  }
+
+  class MyRand extends Random
+  {
+    override def nextDouble() : Double ={
+      this.nextInt(1234)
+    }
   }
 
   // SparseMatrix test
@@ -69,7 +140,7 @@ object MyClass {
 
     val m2 = DenseMatrix
     val rng = new Random()
-    val denseM = m2.rand(numRows, numCols, rng) // what does this do?
+    val denseM = m2.rand(numRows, numCols, rng)
 
     return 0
   }
